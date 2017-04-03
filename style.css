@@ -1,0 +1,17 @@
+body {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin: 0;
+    bottom: 0;
+    background: #7afff6;
+}
+
+canvas {
+    background: linear-gradient(to bottom, #46ffdd 0%,#8367d8 100%);
+}
+
+/*252525*/
+/*#46ffdd*/
+/*#8367d8*/
