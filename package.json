@@ -9,6 +9,7 @@
   "author": "Alessandro Rigobello",
   "license": "ISC",
   "dependencies": {
+    "cannon": "^0.6.2",
     "gsap": "1.19.1",
     "raf-loop": "^1.1.3",
     "three": "^0.84.0",

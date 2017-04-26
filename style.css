@@ -5,11 +5,7 @@ body {
     right: 0;
     margin: 0;
     bottom: 0;
-    background: #7afff6;
-}
-
-canvas {
-    background: linear-gradient(to bottom, #46ffdd 0%,#8367d8 100%);
+    background: #000;
 }
 
 /*252525*/
