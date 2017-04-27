@@ -1,60 +1,57 @@
-class Player {
+const THREE = require('three');
+const gsap = require('gsap');
+import colors from './colors';
+import globals from './globals';
+
+export default class Player {
     constructor() {
         this.spaceship = new THREE.Object3D(),
-        spaceshipMesh = null;
+        this.mesh = null;
+        this.init();
     }
+
     init() {
         // Create player on json load
         var ObjectLoader = new THREE.ObjectLoader();
-        ObjectLoader.load("assets/model.json", function(obj) {
+
+        ObjectLoader.load('./spaceship.json', (obj) => {
             var m = new THREE.Matrix4();
             m.makeRotationY(Math.PI / 1);
             m.makeRotationX(Math.PI / 2);
             obj.geometry.applyMatrix(m);
-            player.mesh = obj.geometry;
-            player.create();
-            enemies.create();
+            this.geometry = obj.geometry;
+            this.create();
         });
     }
 
     create() {
-
-        var material = new THREE.MeshPhongMaterial({
+        const material = new THREE.MeshPhongMaterial({
             color: colors.player.color,
             emissive: colors.player.emissive,
             shading: THREE.FlatShading,
             shininess: 0
         });
 
-        var spaceshipMesh = new THREE.Mesh(player.mesh, material);
+        this.mesh = new THREE.Mesh(this.geometry, material);
+        this.mesh.scale.set(25, 25, 25);
+        this.mesh.position.set(0, 50, 0);
+        this.mesh.castShadow = true;
+        this.mesh.name = "playerMesh";
 
-        spaceshipMesh.scale.set(25, 25, 25);
-        spaceshipMesh.position.set(0, 50, 0);
-        spaceshipMesh.castShadow = true;
-        spaceshipMesh.name = "playerMesh";
+        this.spaceship.add(this.mesh);
 
-        player.spaceship.add(spaceshipMesh);
-        player.spaceshipMesh = spaceshipMesh;
-        scene.add(player.spaceship);
+        this.spaceship.position.x = globals.step / 2;
+        this.spaceship.position.z = globals.step * 7 - (globals.step / 2);
+        this.spaceship.rotation.y = Math.PI / 1;
 
-        if (opts.helpers) {
-
-            var axisHelper = new THREE.AxisHelper(100);
-            axisHelper.position.y = 50;
-            player.spaceship.add(axisHelper);
-        }
-
-        player.spaceship.position.z = 1500;
-        player.spaceship.rotation.y = Math.PI / 1;
-
-        TweenMax.to(player.spaceship.position, 1.2, {
-            z: 500,
+        TweenMax.to(this.spaceship.position, 1.2, {
+            delay: 2,
+            z: (globals.step * 3) - (globals.step / 2),
             ease: Power2.easeOut,
-            onComplete: function() {
-                player.events();
+            onComplete: () => {
+                this.events();
             }
         });
-
     }
 
     events() {
@@ -66,66 +63,77 @@ class Player {
         };
 
         const onKeyDown = this.onKeyDown;
-        document.addEventListener("keydown", onKeyDown, false);
+        document.addEventListener('keydown', onKeyDown.bind(this), false);
         // document.addEventListener("keyup", onKeyUp, false);
     }
 
     onKeyDown(event) {
+        if (this.isAnimating) {
+            return;
+        }
 
-        console.log(this.controlKeys[event.keyCode]);
+        this.isAnimating = true;
+        const move = globals.step;
 
         // Move left
         if (this.controlKeys[event.keyCode] === 'left') {
-            TweenMax.to(this.point.position, 2, {
-                x: this.point.position.x -= 100,
+            TweenMax.to(this.spaceship.rotation, 0.3, { z: -0.2 });
+            TweenMax.to(this.spaceship.position, 0.3, {
+                x: this.spaceship.position.x - move,
                 ease: Power2.easeOut,
+                onComplete: () => {
+                    this.isAnimating = false;
+                    TweenMax.to(this.spaceship.rotation, 0.3, {z: 0});
+                }
             });
         }
 
         // Move right
         if (this.controlKeys[event.keyCode] === 'right') {
-            TweenMax.to(this.point.position, 2, {
-                x: this.point.position.x += 100,
-                ease: Power2.easeOut,
+            TweenMax.to(this.spaceship.rotation, 0.3, { z: 0.2 });
+            TweenMax.to(this.spaceship.position, 0.3, {
+                x: this.spaceship.position.x + move,
+                onComplete: () => {
+                    this.isAnimating = false;
+                    TweenMax.to(this.spaceship.rotation, 0.3, {z: 0});
+                }
             });
         }
 
         // Move forward
         if (this.controlKeys[event.keyCode] === 'forward') {
-            TweenMax.to(this.point.position, 2, {
-                z: -this.moveDistanceZ,
-                ease: Power2.easeOut
+            TweenMax.to(this.spaceship.rotation, 0.3, { x: -0.2 });
+            TweenMax.to(this.spaceship.position, 0.3, {
+                z: this.spaceship.position.z - move,
+                ease: Power2.easeOut,
+                onComplete: () => {
+                    TweenMax.to(this.spaceship.rotation, 0.3, { x: 0 });
+                    this.isAnimating = false;
+                }
             });
         }
 
         // Move backward
         if (this.controlKeys[event.keyCode] === 'backward') {
-            TweenMax.to(this.point.position, 2, {
-                z:  this.moveDistanceZ,
-                ease: Power2.easeOut
+            TweenMax.to(this.spaceship.rotation, 0.3, { x: 0.2 });
+            TweenMax.to(this.spaceship.position, 0.3, {
+                z:  this.spaceship.position.z + move,
+                ease: Power2.easeOut,
+                onComplete: () => {
+                    TweenMax.to(this.spaceship.rotation, 0.3, { x: 0 });
+                    this.isAnimating = false;
+                }
             });
         }
     }
 
-    fire() {
-
-        gun.fire();
-
-        TweenMax.to(player.spaceshipMesh.position, 0.06, {
-            z: player.spaceshipMesh.position.z - 5,
-            onComplete: function() {
-                TweenMax.to(player.spaceshipMesh.position, 0.06, {
-                    z: 0
-                });
-            }
-        });
-
-        TweenMax.to(player.spaceshipMesh.rotation, 0.06, {
-            x: player.spaceshipMesh.rotation.x - .15,
-            onComplete: function() {
-                TweenMax.to(player.spaceshipMesh.rotation, 0.06, {
-                    x: player.spaceshipMesh.rotation.x + .15
-                });
+    dead() {
+        TweenMax.to(this.spaceship.position, 0.3, {
+            z:  this.spaceship.position.z + move,
+            ease: Power2.easeOut,
+            onComplete: () => {
+                TweenMax.to(this.spaceship.rotation, 0.3, { x: 0 });
+                this.isAnimating = false;
             }
         });
     }

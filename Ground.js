@@ -2,19 +2,21 @@ const CANNON = require('cannon');
 const THREE = require('three');
 
 import colors from './colors';
+import globals from './globals';
 
 export default class Ground {
-    constructor() {
-        const solidGroundGeo = new THREE.PlaneGeometry(10000, 10000, 1, 1);
+    constructor(s, d) {
+        const solidGroundGeo = new THREE.PlaneGeometry(s, s, d, d);
         solidGroundGeo.rotateX(-Math.PI / 2);
 
         this.texture = new THREE.TextureLoader().load('/assets/ground.png');
         this.texture.wrapS = this.texture.wrapT = THREE.RepeatWrapping;
-        const textureSize = 85;
+        const textureSize = globals.step;
         this.texture.repeat.set(textureSize, textureSize);
 
         const floorMat = new THREE.MeshLambertMaterial({
             map: this.texture,
+            // wireframe: true,
             emissive: colors.floor.emissive,
             side: THREE.DoubleSide,
         });
@@ -25,7 +27,7 @@ export default class Ground {
     }
 
     update() {
-        this.texture.offset.y += 0.02;
+        // this.texture.offset.y += 0.02;
     }
 
     getGround() {

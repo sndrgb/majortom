@@ -5,6 +5,10 @@ const colors = {
         step: 5
     },
     ambient: 0x404040,
+    player: {
+        color: 0x3d2c65,
+        emissive: 0x3d2c65,
+    },
     floor: {
         emissive: 0x3d2c65
     }

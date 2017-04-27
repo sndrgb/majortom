@@ -1,7 +1,8 @@
 const THREE = require('three');
 
-let previous = false;
+import globals from './globals';
 
+let previous = false;
 export default class Computer {
     constructor() {
         this.obj = null;
@@ -11,13 +12,10 @@ export default class Computer {
         const loader = new THREE.JSONLoader();
         const promise = new Promise((resolve) => { 
             const done = resolve; 
-            loader.load(
-                '/pc.json',
-                (geometry, materials) => {
-                    const mesh = new THREE.Mesh(geometry, materials);
-                    this.generateMesh(mesh, done);
-                }
-            );
+            loader.load('/pc.json', (geometry, materials) => {
+                const mesh = new THREE.Mesh(geometry, materials);
+                this.generateMesh(mesh, done);
+            });
         });
 
         return promise;
@@ -48,7 +46,8 @@ export default class Computer {
         obj.name = 'computer';
 
         this.obj = obj;
-        this.obj.position.z = -0;
+        this.obj.position.x = globals.step / 2;
+        this.obj.position.z = 0;
         done();
     }
 
@@ -62,7 +61,6 @@ export default class Computer {
             const mesh = this.obj.children[0];
             const next = frustum.intersectsObject(mesh);
             if (next === false && previous === true) {
-                console.log('enter');
                 this.obj.position.z = -1500;
             }
 

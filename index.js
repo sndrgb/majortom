@@ -2,11 +2,11 @@ const THREE = require('three');
 const loop = require('raf-loop');
 const gsap = require('gsap');
 const CANNON = require('cannon');
-
 const OrbitControls = require('three-orbitcontrols');
-import { deg2rad } from './utils';
 
+import { deg2rad } from './utils';
 import colors from './colors';
+import globals from './globals';
 import Computer from './Computer';
 import Card from './Card';
 import World from './World';
@@ -14,28 +14,16 @@ import Ground from './Ground';
 import Player from './Player';
 import Sphere from './Sphere';
 
+
 class Scene {
     constructor() {
         this.instances = [];
+        this.collidableMeshes = [];
         this.scene = new THREE.Scene();
-        // this.scene.fog = new THREE.Fog(0xdddddd, 100,950);
+        this.scene.fog = new THREE.Fog(0xdddddd, 100,950);
 
         this.render = this.render.bind(this);
         this.loop = loop(this.render);
-
-        // const aspectRatio = window.innerWidth / window.innerHeight;
-        // const fieldOfView = 60;
-        // const nearPlane = 1;
-        // const farPlane = 10000;
-        // this.camera = new THREE.PerspectiveCamera(
-        //     fieldOfView,
-        //     aspectRatio,
-        //     nearPlane,
-        //     farPlane
-        //     );
-        // this.camera.position.x = 200;
-        // this.camera.position.z = 200;
-        // this.camera.position.y = 300;
 
         const width = window.innerWidth;
         const height = window.innerHeight;
@@ -48,8 +36,8 @@ class Scene {
         this.camera.updateProjectionMatrix();
         this.camera.lookAt(this.scene.position);
 
-        this.renderer = new THREE.WebGLRenderer({ 
-            alpha: true, 
+        this.renderer = new THREE.WebGLRenderer({
+            alpha: true,
             antialias: true,
         });
         this.renderer.setPixelRatio( window.devicePixelRatio );
@@ -79,18 +67,21 @@ class Scene {
         this.instances.push(this.computer);
 
         for (let i = 1; i <= 8; i++) {
-            const sphere = new Sphere(this.frustum);
+            const sphere = new Sphere(this.frustum, this.scene);
             this.instances.push(sphere);
+            this.collidableMeshes.push(sphere.mesh);
             this.objects.add(sphere.getSphere());
         }
 
-        this.ground = new Ground();
+        this.ground = new Ground(globals.size, globals.divisions);
         this.scene.add(this.ground.getGround());
 
         this.addLights();
         this.addHelpers();
 
         this.player = new Player();
+        this.scene.add(this.player.spaceship);
+
         this.world = new World();
 
         this.scene.add(this.objects);
@@ -147,11 +138,6 @@ class Scene {
         dirLight.shadow.camera.bottom = -d;
         dirLight.shadow.camera.far = 2000;
         dirLight.shadow.bias = -0.0015;
-
-        const dirhelper = new THREE.DirectionalLightHelper(dirLight, 5);
-        this.scene.add(dirhelper );
-        const shadowhelper = new THREE.CameraHelper( dirLight.shadow.camera );
-        this.scene.add(shadowhelper);
     }
 
     render() {
@@ -160,8 +146,22 @@ class Scene {
 
         this.instances.forEach(el => el.update(this.frustum));
 
-        // this.point.position.z = Math.sin(now) * 500;
-        // this.point.position.x = Math.cos(now) * 500;
+        if (this.collidableMeshes[0] !== undefined && this.player.mesh) {
+            const originPoint = this.player.spaceship.position.clone();
+
+            for (var vertexIndex = 0; vertexIndex < this.player.mesh.geometry.vertices.length; vertexIndex++) {
+                const localVertex = this.player.mesh.geometry.vertices[vertexIndex].clone();
+                const globalVertex = localVertex.applyMatrix4(this.player.mesh.matrix);
+                const directionVector = globalVertex.sub(this.player.mesh.position);
+
+                const ray = new THREE.Raycaster(originPoint, directionVector.clone().normalize());
+                const collisionResults = ray.intersectObjects(this.collidableMeshes);
+                if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length()) {
+                    console.log('hit');
+                    this.loop.stop();
+                }
+            }
+        }
 
         this.renderer.render(this.scene, this.camera);
     }
