@@ -14,9 +14,7 @@ export default class Computer {
             loader.load(
                 '/pc.json',
                 (geometry, materials) => {
-                    const material = new THREE.MultiMaterial(materials);
-                    const mesh = new THREE.Mesh(geometry, material);
-                    
+                    const mesh = new THREE.Mesh(geometry, materials);
                     this.generateMesh(mesh, done);
                 }
             );

@@ -11,7 +11,7 @@ import Computer from './Computer';
 import Card from './Card';
 import World from './World';
 import Ground from './Ground';
-import Keyboard from './Keyboard';
+import Player from './Player';
 import Sphere from './Sphere';
 
 class Scene {
@@ -90,7 +90,7 @@ class Scene {
         this.addLights();
         this.addHelpers();
 
-        this.keys = new Keyboard();
+        this.player = new Player();
         this.world = new World();
 
         this.scene.add(this.objects);
