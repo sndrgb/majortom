@@ -16,22 +16,21 @@ export default class Keyboard {
     }
 
     onKeyDown(event) {
-        const moveDistance = 2000;
 
         console.log(this.controlKeys[event.keyCode]);
 
         // Move left
         if (this.controlKeys[event.keyCode] === 'left') {
-            TweenMax.to(this.point.position, 2, { 
-                x: this.point.position.x - moveDistance, 
+            TweenMax.to(this.point.position, 2, {
+                x: this.point.position.x -= 100,
                 ease: Power2.easeOut,
             });
         }
 
         // Move right
         if (this.controlKeys[event.keyCode] === 'right') {
-            TweenMax.to(this.point.position, 2, { 
-                x: this.point.position.x + moveDistance, 
+            TweenMax.to(this.point.position, 2, {
+                x: this.point.position.x += 100,
                 ease: Power2.easeOut,
             });
         }
@@ -39,7 +38,7 @@ export default class Keyboard {
         // Move forward
         if (this.controlKeys[event.keyCode] === 'forward') {
             TweenMax.to(this.point.position, 2, {
-                z: this.point.position.z - moveDistance,
+                z: -this.moveDistanceZ,
                 ease: Power2.easeOut
             });
         }
@@ -47,7 +46,7 @@ export default class Keyboard {
         // Move backward
         if (this.controlKeys[event.keyCode] === 'backward') {
             TweenMax.to(this.point.position, 2, {
-                z: this.point.position.z + moveDistance,
+                z:  this.moveDistanceZ,
                 ease: Power2.easeOut
             });
         }

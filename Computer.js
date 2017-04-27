@@ -1,5 +1,7 @@
 const THREE = require('three');
 
+let previous = false;
+
 export default class Computer {
     constructor() {
         this.obj = null;
@@ -34,7 +36,7 @@ export default class Computer {
         vector.multiplyScalar(0.5);
         vector.add(bbox.min);
 
-        // matrix.makeTranslation(-vector.x, -vector.y, -vector.z);
+        matrix.makeTranslation(-vector.x, -vector.y, -vector.z);
         mesh.geometry.applyMatrix(matrix);
         mesh.geometry.verticesNeedUpdate = true;
         mesh.castShadow = true;
@@ -48,16 +50,27 @@ export default class Computer {
         obj.name = 'computer';
 
         this.obj = obj;
-        this.obj.position.z = -1000;
+        this.obj.position.z = -0;
         done();
     }
 
-    update() {
+    update(frustum) {
         const timer = Date.now() * 0.001;
 
         if (this.obj) {
-            this.obj.position.y = (Math.sin(timer) * 20) + 25;
-            this.obj.position.z += 0.8;
+            this.obj.position.y = (Math.sin(timer) * 20) + 60;
+            this.obj.position.z += 0.5;
+
+            const mesh = this.obj.children[0];
+            const next = frustum.intersectsObject(mesh);
+            if (next === false && previous === true) {
+                console.log('enter');
+                this.obj.position.z = -1500;
+            }
+
+            if (next !== previous) {
+                previous = next;
+            }
         }
     }
 }
