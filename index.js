@@ -117,8 +117,8 @@ class Scene {
 
         this.scene.add( dirLight );
 
-        dirLight.shadow.mapSize.width = 2048;
-        dirLight.shadow.mapSize.height = 2048;
+        dirLight.shadow.mapSize.width = 4096;
+        dirLight.shadow.mapSize.height = 4096;
 
         const d = 500;
 

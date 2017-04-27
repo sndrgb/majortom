@@ -48,6 +48,7 @@ export default class Computer {
         obj.name = 'computer';
 
         this.obj = obj;
+        this.obj.position.z = -1000;
         done();
     }
 
@@ -56,7 +57,7 @@ export default class Computer {
 
         if (this.obj) {
             this.obj.position.y = (Math.sin(timer) * 20) + 25;
-            // this.obj.position.z += 0.8;
+            this.obj.position.z += 0.8;
         }
     }
 }

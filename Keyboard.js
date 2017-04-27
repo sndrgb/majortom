@@ -16,7 +16,7 @@ export default class Keyboard {
     }
 
     onKeyDown(event) {
-        const moveDistance = 200;
+        const moveDistance = 2000;
 
         console.log(this.controlKeys[event.keyCode]);
 
