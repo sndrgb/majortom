@@ -56,7 +56,7 @@ export default class Computer {
 
         if (this.obj) {
             this.obj.position.y = (Math.sin(timer) * 20) + 25;
-            // this.obj.rotation.y += 0.02;
+            // this.obj.position.z += 0.8;
         }
     }
 }

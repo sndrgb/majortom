@@ -16,6 +16,7 @@ import Keyboard from './Keyboard';
 class Scene {
     constructor() {
         this.scene = new THREE.Scene();
+        // this.scene.fog = new THREE.Fog(0xdddddd, 100,950);
 
         this.render = this.render.bind(this);
         this.loop = loop(this.render);
@@ -25,13 +26,28 @@ class Scene {
         // this.camera.position.y = 50;
         // this.camera.lookAt(this.scene.position);
 
-        const width = window.innerWidth;
-        const height = window.innerHeight;
-        this.camera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, -10000, 100000);
+        const aspectRatio = window.innerWidth / window.innerHeight;
+        const fieldOfView = 60;
+        const nearPlane = 1;
+        const farPlane = 10000;
+        this.camera = new THREE.PerspectiveCamera(
+            fieldOfView,
+            aspectRatio,
+            nearPlane,
+            farPlane
+            );
         this.camera.position.x = 200;
-        this.camera.position.y = 190;
         this.camera.position.z = 200;
-        this.camera.zoom = 1.8;
+        this.camera.position.y = 300;
+
+        // const width = window.innerWidth;
+        // const height = window.innerHeight;
+        // this.camera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, -10000, 100000);
+        // this.camera.position.x = 200;
+        // this.camera.position.y = 190;
+        // this.camera.position.z = 200;
+        // this.camera.zoom = 1.8;
+
         this.camera.updateProjectionMatrix();
         this.camera.lookAt(this.scene.position);
 
@@ -63,12 +79,11 @@ class Scene {
         this.ground = new Ground();
         this.scene.add(this.ground.getGround());
 
-        this.keys = new Keyboard(this.camera, this.scene);
-        this.scene.add(this.keys.getKeyboard());
 
         this.addLights();
-        // this.addHelpers();
+        this.addHelpers();
 
+        this.keys = new Keyboard(this.dirLight);
         this.world = new World();
 
         // start rendering
