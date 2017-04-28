@@ -96,7 +96,7 @@ export default class Player {
                 onComplete: () => {
                     this.isAnimating = false;
                     TweenMax.to(this.spaceship.rotation, 0.3, {z: 0});
-                }
+                }q
             });
         }
 
