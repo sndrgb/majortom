@@ -7,7 +7,7 @@ export default class Sphere {
     constructor(frustum, scene) {
         this.obj = new THREE.Object3D();
 
-        const geometry = new THREE.SphereGeometry(20, 5, 5);
+        const geometry = new THREE.SphereGeometry(20, 20, 20);
         const material = new THREE.MeshLambertMaterial({
             color: 0xffffff
         });
@@ -20,7 +20,7 @@ export default class Sphere {
         this.mesh.position.set(x, 80, -500);
 
         this.translate = _.random(-10, 25);
-        this.velocity = _.random(0.2, 3);
+        this.velocity = _.random(0.2, 5);
         this.previous = false;
     }
 
@@ -38,7 +38,8 @@ export default class Sphere {
             const next = frustum.intersectsObject(this.mesh);
 
             if (next === false && this.previous === true) {
-                this.mesh.position.z = -1500;
+
+                this.mesh.position.z = - 885;
             }
 
             if (next !== this.previous) {

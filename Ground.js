@@ -27,7 +27,7 @@ export default class Ground {
     }
 
     update() {
-        // this.texture.offset.y += 0.02;
+        this.texture.offset.y += 0.02;
     }
 
     getGround() {

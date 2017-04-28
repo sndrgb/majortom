@@ -14,6 +14,7 @@ export default class Computer {
             const done = resolve; 
             loader.load('/pc.json', (geometry, materials) => {
                 const mesh = new THREE.Mesh(geometry, materials);
+                this.mesh = mesh;
                 this.generateMesh(mesh, done);
             });
         });
@@ -58,8 +59,7 @@ export default class Computer {
             this.obj.position.y = (Math.sin(timer) * 20) + 60;
             this.obj.position.z += 0.5;
 
-            const mesh = this.obj.children[0];
-            const next = frustum.intersectsObject(mesh);
+            const next = frustum.intersectsObject(this.mesh);
             if (next === false && previous === true) {
                 this.obj.position.z = -1500;
             }

@@ -27,9 +27,17 @@ class Scene {
 
         const width = window.innerWidth;
         const height = window.innerHeight;
-        this.camera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, -10000, 100000);
+        const ratio = width / height;
+
+        // http://stackoverflow.com/questions/31978368/three-js-fit-orthographic-camera-to-scene
+        // http://stackoverflow.com/questions/14614252/how-to-fit-camera-to-object
+        // var maxDim = Math.max(width, height);
+        // var distance = maxDim/ 2 /  ratio / Math.tan(Math.PI * fov / 360);
+
+        this.camera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, -1000, 10000);
+
         this.camera.position.x = 200;
-        this.camera.position.y = 190;
+        this.camera.position.y = 200;
         this.camera.position.z = 200;
         this.camera.zoom = 1.8;
 
@@ -61,12 +69,13 @@ class Scene {
         this.computer = new Computer();
         this.computer.loadJson().then(() => {
             const computer = this.computer.obj;
+            this.collidableMeshes.push(this.computer.mesh);
             this.objects.add(computer);
          });
 
         this.instances.push(this.computer);
 
-        for (let i = 1; i <= 8; i++) {
+        for (let i = 1; i <= 20; i++) {
             const sphere = new Sphere(this.frustum, this.scene);
             this.instances.push(sphere);
             this.collidableMeshes.push(sphere.mesh);
@@ -77,7 +86,7 @@ class Scene {
         this.scene.add(this.ground.getGround());
 
         this.addLights();
-        this.addHelpers();
+        // this.addHelpers();
 
         this.player = new Player();
         this.scene.add(this.player.spaceship);
@@ -99,12 +108,28 @@ class Scene {
         cameraViewProjectionMatrix.multiplyMatrices(this.camera.projectionMatrix, this.camera.matrixWorldInverse);
 
         this.frustum.setFromMatrix(cameraViewProjectionMatrix);
+
+        console.log(this.frustum);
     }
 
     addHelpers() {
         const controls = new OrbitControls(this.camera, this.renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.25;
+
+        const solidGroundGeo = new THREE.PlaneGeometry(window.innerWidth, window.innerHeight, 20, 20);
+        solidGroundGeo.rotateX(-Math.PI / 2);
+        const floorMat = new THREE.MeshLambertMaterial({
+            wireframe: true,
+            color: 0xff0000,
+            side: THREE.DoubleSide,
+        });
+
+        const ground = new THREE.Mesh(solidGroundGeo, floorMat);
+        this.scene.add(ground);
+
+        var helper = new THREE.CameraHelper( this.camera );
+        this.scene.add( helper );
 
         const axisHelper = new THREE.AxisHelper(5);
         this.scene.add(axisHelper);
@@ -157,8 +182,7 @@ class Scene {
                 const ray = new THREE.Raycaster(originPoint, directionVector.clone().normalize());
                 const collisionResults = ray.intersectObjects(this.collidableMeshes);
                 if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length()) {
-                    console.log('hit');
-                    this.loop.stop();
+                    this.player.dead();
                 }
             }
         }

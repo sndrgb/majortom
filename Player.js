@@ -4,7 +4,8 @@ import colors from './colors';
 import globals from './globals';
 
 export default class Player {
-    constructor() {
+    constructor(frustum) {
+        this.frustum = frustum;
         this.spaceship = new THREE.Object3D(),
         this.mesh = null;
         this.init();
@@ -96,7 +97,7 @@ export default class Player {
                 onComplete: () => {
                     this.isAnimating = false;
                     TweenMax.to(this.spaceship.rotation, 0.3, {z: 0});
-                }q
+                }
             });
         }
 
@@ -128,13 +129,13 @@ export default class Player {
     }
 
     dead() {
-        TweenMax.to(this.spaceship.position, 0.3, {
-            z:  this.spaceship.position.z + move,
+        TweenMax.to(this.spaceship.position, 10, {
+            y:  5000,
             ease: Power2.easeOut,
-            onComplete: () => {
-                TweenMax.to(this.spaceship.rotation, 0.3, { x: 0 });
-                this.isAnimating = false;
-            }
+        });
+
+        TweenMax.to(this.spaceship.rotation, 0.5, {
+            y: 5
         });
     }
 }
