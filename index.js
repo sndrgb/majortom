@@ -75,7 +75,7 @@ class Scene {
 
         this.instances.push(this.computer);
 
-        for (let i = 1; i <= 20; i++) {
+        for (let i = 1; i <= 0; i++) {
             const sphere = new Sphere(this.frustum, this.scene);
             this.instances.push(sphere);
             this.collidableMeshes.push(sphere.mesh);
@@ -86,7 +86,7 @@ class Scene {
         this.scene.add(this.ground.getGround());
 
         this.addLights();
-        // this.addHelpers();
+        this.addHelpers();
 
         this.player = new Player();
         this.scene.add(this.player.spaceship);
@@ -117,16 +117,16 @@ class Scene {
         controls.enableDamping = true;
         controls.dampingFactor = 0.25;
 
-        const solidGroundGeo = new THREE.PlaneGeometry(window.innerWidth, window.innerHeight, 20, 20);
+        /*const solidGroundGeo = new THREE.PlaneGeometry(window.innerWidth, window.innerHeight, 20, 20);
         solidGroundGeo.rotateX(-Math.PI / 2);
         const floorMat = new THREE.MeshLambertMaterial({
             wireframe: true,
             color: 0xff0000,
             side: THREE.DoubleSide,
-        });
+        }); */
 
-        const ground = new THREE.Mesh(solidGroundGeo, floorMat);
-        this.scene.add(ground);
+        /*const ground = new THREE.Mesh(solidGroundGeo, floorMat);
+        this.scene.add(ground);*/
 
         var helper = new THREE.CameraHelper( this.camera );
         this.scene.add( helper );
