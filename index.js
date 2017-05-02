@@ -27,14 +27,16 @@ class Scene {
 
         const width = window.innerWidth;
         const height = window.innerHeight;
-        const ratio = width / height;
+        const aspect = width / height;
+        const d = 600;
+        window.ASPECT_RATIO = aspect;
 
         // http://stackoverflow.com/questions/31978368/three-js-fit-orthographic-camera-to-scene
         // http://stackoverflow.com/questions/14614252/how-to-fit-camera-to-object
         // var maxDim = Math.max(width, height);
         // var distance = maxDim/ 2 /  ratio / Math.tan(Math.PI * fov / 360);
 
-        this.camera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, -1000, 10000);
+        this.camera = new THREE.OrthographicCamera( -d * aspect, d * aspect, d, - d, -1000, 1000);
 
         this.camera.position.x = 200;
         this.camera.position.y = 200;
@@ -117,16 +119,19 @@ class Scene {
         controls.enableDamping = true;
         controls.dampingFactor = 0.25;
 
-        /*const solidGroundGeo = new THREE.PlaneGeometry(window.innerWidth, window.innerHeight, 20, 20);
+        const solidGroundGeo = new THREE.PlaneGeometry(
+            window.ASPECT_RATIO * 500,
+            window.ASPECT_RATIO * 500,
+        20, 20);
         solidGroundGeo.rotateX(-Math.PI / 2);
         const floorMat = new THREE.MeshLambertMaterial({
             wireframe: true,
             color: 0xff0000,
             side: THREE.DoubleSide,
-        }); */
+        });
 
-        /*const ground = new THREE.Mesh(solidGroundGeo, floorMat);
-        this.scene.add(ground);*/
+        const ground = new THREE.Mesh(solidGroundGeo, floorMat);
+        this.scene.add(ground);
 
         var helper = new THREE.CameraHelper( this.camera );
         this.scene.add( helper );
