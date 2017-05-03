@@ -69,27 +69,29 @@ class Scene {
         this.objects = new THREE.Object3D();
         this.calculateFrustum();
 
-        this.computer = new Computer();
-        this.computer.loadJson().then(() => {
-            const computer = this.computer.obj;
-            this.collidableMeshes.push(this.computer.mesh);
-            this.objects.add(computer);
-         });
+        setTimeout(() => {
+            this.computer = new Computer();
+            this.computer.loadJson().then(() => {
+                const computer = this.computer.obj;
+                this.collidableMeshes.push(this.computer.mesh);
+                this.objects.add(computer);
+            });
 
-        this.instances.push(this.computer);
+            this.instances.push(this.computer);
 
-        for (let i = 20; i <= 0; i++) {
-            const sphere = new Sphere(this.frustum, this.scene);
-            this.instances.push(sphere);
-            this.collidableMeshes.push(sphere.mesh);
-            this.objects.add(sphere.getSphere());
-        }
+            for (let i = 0; i <= 10; i++) {
+                const sphere = new Sphere(this.frustum, this.scene);
+                this.instances.push(sphere);
+                this.collidableMeshes.push(sphere.mesh);
+                this.objects.add(sphere.getSphere());
+            }
+        }, 3000);
 
         this.ground = new Ground(globals.size, globals.divisions);
         this.scene.add(this.ground.getGround());
 
         this.addLights();
-        // this.addHelpers();
+        this.addHelpers();
 
         this.player = new Player();
         this.scene.add(this.player.spaceship);
@@ -120,21 +122,18 @@ class Scene {
         controls.enableDamping = true;
         controls.dampingFactor = 0.25;
 
-        // const diagonal = Math.sqrt(Math.abs(this.camera.left * this.camera.left) + Math.abs(this.camera.top * this.camera.top));
+        const solidGroundGeo = new THREE.PlaneGeometry(
+            globals.STEP * 2,
+            (this.camera.top * 2) + (this.camera.position.z * 2),
+        20, 20);
+        solidGroundGeo.rotateX(-Math.PI / 2);
+        const floorMat = new THREE.MeshLambertMaterial({
+            wireframe: true,
+            color: 0xff0000,
+            side: THREE.DoubleSide,
+        });
 
-        // console.log(this.camera.left, this.camera.top, diagonal);
-        // const solidGroundGeo = new THREE.PlaneGeometry(
-        //     this.camera.left * 2,
-        //     (this.camera.top * 2) + (this.camera.position.z * 2),
-        // 20, 20);
-        // solidGroundGeo.rotateX(-Math.PI / 2);
-        // const floorMat = new THREE.MeshLambertMaterial({
-        //     wireframe: true,
-        //     color: 0xff0000,
-        //     side: THREE.DoubleSide,
-        // });
-
-        // const ground = new THREE.Mesh(solidGroundGeo, floorMat);
+        const ground = new THREE.Mesh(solidGroundGeo, floorMat);
         // this.scene.add(ground);
 
         var helper = new THREE.CameraHelper( this.camera );
