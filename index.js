@@ -22,13 +22,15 @@ class Scene {
         this.scene = new THREE.Scene();
         this.scene.fog = new THREE.Fog(0xdddddd, 100,950);
 
+        window.scene = this.scene;
+        window.THREE = THREE;
+
         this.render = this.render.bind(this);
         this.loop = loop(this.render);
 
         const width = window.innerWidth;
         const height = window.innerHeight;
         const aspect = width / height;
-        const d = 600;
         window.ASPECT_RATIO = aspect;
 
         // http://stackoverflow.com/questions/31978368/three-js-fit-orthographic-camera-to-scene
@@ -36,8 +38,7 @@ class Scene {
         // var maxDim = Math.max(width, height);
         // var distance = maxDim/ 2 /  ratio / Math.tan(Math.PI * fov / 360);
 
-        this.camera = new THREE.OrthographicCamera( -d * aspect, d * aspect, d, - d, -1000, 1000);
-
+        this.camera = new THREE.OrthographicCamera(width / - 2, width / 2, height / 2, height / - 2, -1000, 5000);
         this.camera.position.x = 200;
         this.camera.position.y = 200;
         this.camera.position.z = 200;
@@ -77,7 +78,7 @@ class Scene {
 
         this.instances.push(this.computer);
 
-        for (let i = 1; i <= 0; i++) {
+        for (let i = 20; i <= 0; i++) {
             const sphere = new Sphere(this.frustum, this.scene);
             this.instances.push(sphere);
             this.collidableMeshes.push(sphere.mesh);
@@ -88,7 +89,7 @@ class Scene {
         this.scene.add(this.ground.getGround());
 
         this.addLights();
-        this.addHelpers();
+        // this.addHelpers();
 
         this.player = new Player();
         this.scene.add(this.player.spaceship);
@@ -119,19 +120,22 @@ class Scene {
         controls.enableDamping = true;
         controls.dampingFactor = 0.25;
 
-        const solidGroundGeo = new THREE.PlaneGeometry(
-            window.ASPECT_RATIO * 500,
-            window.ASPECT_RATIO * 500,
-        20, 20);
-        solidGroundGeo.rotateX(-Math.PI / 2);
-        const floorMat = new THREE.MeshLambertMaterial({
-            wireframe: true,
-            color: 0xff0000,
-            side: THREE.DoubleSide,
-        });
+        // const diagonal = Math.sqrt(Math.abs(this.camera.left * this.camera.left) + Math.abs(this.camera.top * this.camera.top));
 
-        const ground = new THREE.Mesh(solidGroundGeo, floorMat);
-        this.scene.add(ground);
+        // console.log(this.camera.left, this.camera.top, diagonal);
+        // const solidGroundGeo = new THREE.PlaneGeometry(
+        //     this.camera.left * 2,
+        //     (this.camera.top * 2) + (this.camera.position.z * 2),
+        // 20, 20);
+        // solidGroundGeo.rotateX(-Math.PI / 2);
+        // const floorMat = new THREE.MeshLambertMaterial({
+        //     wireframe: true,
+        //     color: 0xff0000,
+        //     side: THREE.DoubleSide,
+        // });
+
+        // const ground = new THREE.Mesh(solidGroundGeo, floorMat);
+        // this.scene.add(ground);
 
         var helper = new THREE.CameraHelper( this.camera );
         this.scene.add( helper );
