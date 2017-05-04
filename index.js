@@ -14,7 +14,6 @@ import Ground from './Ground';
 import Player from './Player';
 import Sphere from './Sphere';
 
-
 class Scene {
     constructor() {
         this.instances = [];
@@ -24,6 +23,12 @@ class Scene {
 
         window.scene = this.scene;
         window.THREE = THREE;
+
+        this.newTime = new Date().getTime();
+        this.oldTime = new Date().getTime();
+
+        this.reset();
+        this.game.deltaTime = 0;
 
         this.render = this.render.bind(this);
         this.loop = loop(this.render);
@@ -70,21 +75,7 @@ class Scene {
         this.calculateFrustum();
 
         setTimeout(() => {
-            this.computer = new Computer();
-            this.computer.loadJson().then(() => {
-                const computer = this.computer.obj;
-                this.collidableMeshes.push(this.computer.mesh);
-                this.objects.add(computer);
-            });
-
-            this.instances.push(this.computer);
-
-            for (let i = 0; i <= 10; i++) {
-                const sphere = new Sphere(this.frustum, this.scene);
-                this.instances.push(sphere);
-                this.collidableMeshes.push(sphere.mesh);
-                this.objects.add(sphere.getSphere());
-            }
+            this.addSpheres();
         }, 3000);
 
         this.ground = new Ground(globals.size, globals.divisions);
@@ -113,8 +104,15 @@ class Scene {
         cameraViewProjectionMatrix.multiplyMatrices(this.camera.projectionMatrix, this.camera.matrixWorldInverse);
 
         this.frustum.setFromMatrix(cameraViewProjectionMatrix);
+    }
 
-        console.log(this.frustum);
+    addSpheres() {
+        for (let i = 0; i <= 4; i++) {
+            const sphere = new Sphere(this.frustum, this.scene, i);
+            this.instances.push(sphere);
+            this.collidableMeshes.push(sphere.mesh);
+            this.objects.add(sphere.getSphere());
+        }
     }
 
     addHelpers() {
@@ -174,6 +172,10 @@ class Scene {
     }
 
     render() {
+        this.newTime = new Date().getTime();
+        this.game.deltaTime = this.newTime - this.oldTime;
+        this.oldTime = this.newTime;
+        
         const now = Date.now() * 0.001;
         this.ground.update();
 
@@ -195,8 +197,55 @@ class Scene {
             }
         }
 
+
+        this.updateDistance();
+        this.game.baseSpeed += (this.game.targetBaseSpeed - this.game.baseSpeed) * this.game.deltaTime * 0.02;
+        this.game.speed = this.game.baseSpeed;
+
         this.renderer.render(this.scene, this.camera);
+    }
+
+    updateDistance(){
+        this.game.distance += this.game.speed * this.game.deltaTime * this.game.ratioSpeedDistance;
+        console.log(Math.floor(this.game.distance));
+        // var d = 502*(1-(this.game.distance%this.game.distanceForLevelUpdate)/this.game.distanceForLevelUpdate);
+        //levelCircle.setAttribute("stroke-dashoffset", d);
+    }
+
+    reset() {
+        this.game = {
+          speed: 0,
+          initSpeed: .00035,
+          baseSpeed: .00035,
+          targetBaseSpeed: .00035,
+          incrementSpeedByTime: .0000025,
+          incrementSpeedByLevel: .000005,
+          distanceForSpeedUpdate: 100,
+          speedLastUpdate: 0,
+          distance: 0,
+          ratioSpeedDistance: 50,
+          level: 1,
+          levelLastUpdate: 0,
+          distanceForLevelUpdate: 1000,
+
+          ennemyDistanceTolerance: 10,
+          ennemyValue: 10,
+          ennemiesSpeed: 0.6,
+          ennemyLastSpawn: 0,
+          distanceForEnnemiesSpawn: 50,
+          status : "playing",
+         };
+
+        console.log(Math.floor(this.game.level));
     }
 }
 
 new Scene();
+
+ /*this.computer = new Computer();
+            this.computer.loadJson().then(() => {
+                const computer = this.computer.obj;
+                this.collidableMeshes.push(this.computer.mesh);
+                this.objects.add(computer);
+            });
+            this.instances.push(this.computer);*/

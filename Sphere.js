@@ -4,7 +4,7 @@ const _ = require('lodash');
 import globals from './globals';
 
 export default class Sphere {
-    constructor(frustum, scene) {
+    constructor(frustum, scene, index) {
         this.obj = new THREE.Object3D();
 
         const geometry = new THREE.SphereGeometry(20, 20, 20);
@@ -15,12 +15,13 @@ export default class Sphere {
         this.mesh.castShadow = true;
         this.obj.add(this.mesh);
 
-        const x = (_.random(-2, 3) * globals.step) - (globals.step / 2);
+        const positions = [-1,0,1,2,3];
+        const x = (positions[index] * globals.step) - (globals.step / 2);
         const vec = new THREE.Vector3(x, 80, 0);
         this.mesh.position.set(x, 80, -500);
 
         this.translate = _.random(-10, 25);
-        this.velocity = _.random(0.2, 5);
+        this.velocity = _.random(20, 50);
         this.previous = false;
     }
 
@@ -38,7 +39,7 @@ export default class Sphere {
             const next = frustum.intersectsObject(this.mesh);
 
             if (next === false && this.previous === true) {
-
+                this.velocity = _.random(20, 50);
                 this.mesh.position.z = - 885;
             }
 
