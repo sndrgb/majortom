@@ -71,7 +71,10 @@ export default class Player {
     }
 
     onKeyDown(event) {
-        if (this.isAnimating) {
+        if (
+            this.isAnimating || 
+            - global.step * 3 > this.spaceship.position.z >= global.step * 3
+        ) {
             return;
         }
 
