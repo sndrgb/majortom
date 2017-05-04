@@ -22,20 +22,23 @@ class Scene {
         this.scene = new THREE.Scene();
         this.scene.fog = new THREE.Fog(0xdddddd, 100,950);
 
+        window.scene = this.scene;
+        window.THREE = THREE;
+
         this.render = this.render.bind(this);
         this.loop = loop(this.render);
 
         const width = window.innerWidth;
         const height = window.innerHeight;
-        const ratio = width / height;
+        const aspect = width / height;
+        window.ASPECT_RATIO = aspect;
 
         // http://stackoverflow.com/questions/31978368/three-js-fit-orthographic-camera-to-scene
         // http://stackoverflow.com/questions/14614252/how-to-fit-camera-to-object
         // var maxDim = Math.max(width, height);
         // var distance = maxDim/ 2 /  ratio / Math.tan(Math.PI * fov / 360);
 
-        this.camera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, -1000, 10000);
-
+        this.camera = new THREE.OrthographicCamera(width / - 2, width / 2, height / 2, height / - 2, -1000, 5000);
         this.camera.position.x = 200;
         this.camera.position.y = 200;
         this.camera.position.z = 200;
@@ -66,21 +69,23 @@ class Scene {
         this.objects = new THREE.Object3D();
         this.calculateFrustum();
 
-        this.computer = new Computer();
-        this.computer.loadJson().then(() => {
-            const computer = this.computer.obj;
-            this.collidableMeshes.push(this.computer.mesh);
-            this.objects.add(computer);
-         });
+        setTimeout(() => {
+            this.computer = new Computer();
+            this.computer.loadJson().then(() => {
+                const computer = this.computer.obj;
+                this.collidableMeshes.push(this.computer.mesh);
+                this.objects.add(computer);
+            });
 
-        this.instances.push(this.computer);
+            this.instances.push(this.computer);
 
-        for (let i = 1; i <= 0; i++) {
-            const sphere = new Sphere(this.frustum, this.scene);
-            this.instances.push(sphere);
-            this.collidableMeshes.push(sphere.mesh);
-            this.objects.add(sphere.getSphere());
-        }
+            for (let i = 0; i <= 10; i++) {
+                const sphere = new Sphere(this.frustum, this.scene);
+                this.instances.push(sphere);
+                this.collidableMeshes.push(sphere.mesh);
+                this.objects.add(sphere.getSphere());
+            }
+        }, 3000);
 
         this.ground = new Ground(globals.size, globals.divisions);
         this.scene.add(this.ground.getGround());
@@ -117,16 +122,19 @@ class Scene {
         controls.enableDamping = true;
         controls.dampingFactor = 0.25;
 
-        /*const solidGroundGeo = new THREE.PlaneGeometry(window.innerWidth, window.innerHeight, 20, 20);
+        const solidGroundGeo = new THREE.PlaneGeometry(
+            globals.STEP * 2,
+            (this.camera.top * 2) + (this.camera.position.z * 2),
+        20, 20);
         solidGroundGeo.rotateX(-Math.PI / 2);
         const floorMat = new THREE.MeshLambertMaterial({
             wireframe: true,
             color: 0xff0000,
             side: THREE.DoubleSide,
-        }); */
+        });
 
-        /*const ground = new THREE.Mesh(solidGroundGeo, floorMat);
-        this.scene.add(ground);*/
+        const ground = new THREE.Mesh(solidGroundGeo, floorMat);
+        // this.scene.add(ground);
 
         var helper = new THREE.CameraHelper( this.camera );
         this.scene.add( helper );

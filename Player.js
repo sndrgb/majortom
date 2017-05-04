@@ -42,7 +42,7 @@ export default class Player {
         this.spaceship.add(this.mesh);
 
         this.spaceship.position.x = globals.step / 2;
-        this.spaceship.position.z = globals.step * 7 - (globals.step / 2);
+        this.spaceship.position.z = 900 * window.ASPECT_RATIO;
         this.spaceship.rotation.y = Math.PI / 1;
 
         TweenMax.to(this.spaceship.position, 1.2, {
