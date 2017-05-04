@@ -6,7 +6,9 @@ import globals from './globals';
 export default class Player {
     constructor(frustum) {
         this.frustum = frustum;
-        this.spaceship = new THREE.Object3D(),
+        this.spaceship = new THREE.Object3D();
+        this.currentHorizontal = 0;
+        this.currentVertical = 0;
         this.mesh = null;
         this.init();
     }
@@ -77,7 +79,11 @@ export default class Player {
         const move = globals.step;
 
         // Move left
-        if (this.controlKeys[event.keyCode] === 'left') {
+        if (
+            this.controlKeys[event.keyCode] === 'left' &&
+            this.currentHorizontal >= -1
+        ) {
+            this.currentHorizontal = this.currentHorizontal - 1;
             TweenMax.to(this.spaceship.rotation, 0.3, { z: -0.2 });
             TweenMax.to(this.spaceship.position, 0.3, {
                 x: this.spaceship.position.x - move,
@@ -90,7 +96,11 @@ export default class Player {
         }
 
         // Move right
-        if (this.controlKeys[event.keyCode] === 'right') {
+        else if (
+            this.controlKeys[event.keyCode] === 'right' &&
+            this.currentHorizontal < 2
+        ) {
+            this.currentHorizontal = this.currentHorizontal + 1;
             TweenMax.to(this.spaceship.rotation, 0.3, { z: 0.2 });
             TweenMax.to(this.spaceship.position, 0.3, {
                 x: this.spaceship.position.x + move,
@@ -102,7 +112,11 @@ export default class Player {
         }
 
         // Move forward
-        if (this.controlKeys[event.keyCode] === 'forward') {
+        else if (
+            this.controlKeys[event.keyCode] === 'forward' &&
+            this.currentVertical >= -1
+        ) {
+            this.currentVertical = this.currentVertical - 1;
             TweenMax.to(this.spaceship.rotation, 0.3, { x: -0.2 });
             TweenMax.to(this.spaceship.position, 0.3, {
                 z: this.spaceship.position.z - move,
@@ -115,7 +129,11 @@ export default class Player {
         }
 
         // Move backward
-        if (this.controlKeys[event.keyCode] === 'backward') {
+        else if (
+            this.controlKeys[event.keyCode] === 'backward' &&
+            this.currentVertical < 1
+        ) {
+            this.currentVertical = this.currentVertical + 1;
             TweenMax.to(this.spaceship.rotation, 0.3, { x: 0.2 });
             TweenMax.to(this.spaceship.position, 0.3, {
                 z:  this.spaceship.position.z + move,
@@ -125,6 +143,8 @@ export default class Player {
                     this.isAnimating = false;
                 }
             });
+        } else {
+            this.isAnimating = false;
         }
     }
 
