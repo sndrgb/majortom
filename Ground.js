@@ -26,8 +26,8 @@ export default class Ground {
         this.ground.receiveShadow = true;
     }
 
-    update() {
-        this.texture.offset.y += 0.02;
+    update(game) {
+        this.texture.offset.y += (game.speed * 20);
     }
 
     getGround() {

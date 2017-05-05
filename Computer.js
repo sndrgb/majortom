@@ -48,7 +48,7 @@ export default class Computer {
 
         this.obj = obj;
         this.obj.position.x = globals.step / 2;
-        this.obj.position.z = 1000;
+        this.obj.position.z = 1500;
         done();
     }
 

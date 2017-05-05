@@ -47,9 +47,12 @@ export default class Player {
         this.spaceship.position.z = 900 * window.ASPECT_RATIO;
         this.spaceship.rotation.y = Math.PI / 1;
 
+
+        console.log('vertici' + this.mesh.geometry.vertices);
+
         TweenMax.to(this.spaceship.position, 1.2, {
             delay: 2,
-            z: (globals.step * 3) - (globals.step / 2),
+            z: (globals.step * 5) - (globals.step / 2),
             ease: Power2.easeOut,
             onComplete: () => {
                 this.events();

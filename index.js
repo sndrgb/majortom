@@ -28,7 +28,6 @@ class Scene {
         this.oldTime = new Date().getTime();
 
         this.reset();
-        this.game.deltaTime = 0;
 
         this.render = this.render.bind(this);
         this.loop = loop(this.render);
@@ -74,15 +73,15 @@ class Scene {
         this.objects = new THREE.Object3D();
         this.calculateFrustum();
 
-        setTimeout(() => {
-            this.addSpheres();
-        }, 3000);
-
         this.ground = new Ground(globals.size, globals.divisions);
         this.scene.add(this.ground.getGround());
 
+        setTimeout(() => {
+            this.addSpheres();
+        }, 5000);
+
         this.addLights();
-        this.addHelpers();
+        // this.addHelpers();
 
         this.player = new Player();
         this.scene.add(this.player.spaceship);
@@ -106,9 +105,15 @@ class Scene {
         this.frustum.setFromMatrix(cameraViewProjectionMatrix);
     }
 
+    reset() {
+        setTimeout(() => {
+            this.addSpheres();
+        }, 5000);
+    }
+
     addSpheres() {
-        for (let i = 0; i <= 4; i++) {
-            const sphere = new Sphere(this.frustum, this.scene, i);
+        for (let i = 0; i <= this.game.enemyValue; i++) {
+            const sphere = new Sphere(this.frustum, this.game, i);
             this.instances.push(sphere);
             this.collidableMeshes.push(sphere.mesh);
             this.objects.add(sphere.getSphere());
@@ -176,11 +181,78 @@ class Scene {
         this.game.deltaTime = this.newTime - this.oldTime;
         this.oldTime = this.newTime;
         
-        const now = Date.now() * 0.001;
-        this.ground.update();
+        this.ground.update(this.game);
+        this.instances.forEach(el => el.update(this.frustum, this.game));
+        this.updateCollisions();
 
-        this.instances.forEach(el => el.update(this.frustum));
+        console.log(Math.floor(this.game.distance), this.game.speed, this.game.level);
+        // update speed
+        if (
+            Math.floor(this.game.distance) % this.game.distanceForSpeedUpdate == 0 &&
+            Math.floor(this.game.distance) > this.game.speedLastUpdate
+        ) {
+            console.log('speed-up');
+            this.game.speedLastUpdate = Math.floor(this.game.distance);
+            this.game.targetBaseSpeed += this.game.incrementSpeedByTime * this.game.deltaTime;
+            console.log(this.game.incrementSpeedByTime, this.game.deltaTime);
+        }
 
+        // update level
+        if (
+            Math.floor(this.game.distance) % this.game.distanceForLevelUpdate == 0 && 
+            Math.floor(this.game.distance) > this.game.levelLastUpdate
+        ) {
+            console.log('level-up');
+            this.game.levelLastUpdate = Math.floor(this.game.distance);
+            this.game.level++;
+            this.fieldLevel.innerHTML = Math.floor(this.game.level);
+            this.game.targetBaseSpeed = this.game.initSpeed + this.game.incrementSpeedByLevel * this.game.level;
+        }
+
+        this.updateDistance();
+        this.game.baseSpeed += (this.game.targetBaseSpeed - this.game.baseSpeed) * this.game.deltaTime * 0.02;
+        this.game.speed = this.game.baseSpeed;
+
+        this.renderer.render(this.scene, this.camera);
+    }
+
+    updateDistance(){
+        this.game.distance += this.game.speed * this.game.deltaTime * this.game.ratioSpeedDistance;
+        //console.log(Math.floor(this.game.distance));
+        // var d = 502*(1-(this.game.distance%this.game.distanceForLevelUpdate)/this.game.distanceForLevelUpdate);
+        //levelCircle.setAttribute("stroke-dashoffset", d);
+    }
+
+    reset() {
+        this.game = {
+          speed: 0,
+          
+          initSpeed: 0.0005,
+          baseSpeed: 0.0005,
+          targetBaseSpeed: 0.0005,
+          
+          incrementSpeedByTime: 0.000005,
+          incrementSpeedByLevel: 0.00001,
+
+          distanceForLevelUpdate: 1000,
+          distanceForSpeedUpdate: 100,
+          distance: 0,
+          speedLastUpdate: 0,
+          ratioSpeedDistance: 20,
+
+          deltaTime: 0,
+          level: 1,
+          levelLastUpdate: 0,
+
+          enemyValue: 4,
+          enemyLastSpawn: 0,
+          status : "playing",
+         };
+
+        // console.log(Math.floor(this.game.level));
+    }
+
+    updateCollisions() {
         if (this.collidableMeshes[0] !== undefined && this.player.mesh) {
             const originPoint = this.player.spaceship.position.clone();
 
@@ -196,56 +268,17 @@ class Scene {
                 }
             }
         }
-
-
-        this.updateDistance();
-        this.game.baseSpeed += (this.game.targetBaseSpeed - this.game.baseSpeed) * this.game.deltaTime * 0.02;
-        this.game.speed = this.game.baseSpeed;
-
-        this.renderer.render(this.scene, this.camera);
-    }
-
-    updateDistance(){
-        this.game.distance += this.game.speed * this.game.deltaTime * this.game.ratioSpeedDistance;
-        console.log(Math.floor(this.game.distance));
-        // var d = 502*(1-(this.game.distance%this.game.distanceForLevelUpdate)/this.game.distanceForLevelUpdate);
-        //levelCircle.setAttribute("stroke-dashoffset", d);
-    }
-
-    reset() {
-        this.game = {
-          speed: 0,
-          initSpeed: .00035,
-          baseSpeed: .00035,
-          targetBaseSpeed: .00035,
-          incrementSpeedByTime: .0000025,
-          incrementSpeedByLevel: .000005,
-          distanceForSpeedUpdate: 100,
-          speedLastUpdate: 0,
-          distance: 0,
-          ratioSpeedDistance: 50,
-          level: 1,
-          levelLastUpdate: 0,
-          distanceForLevelUpdate: 1000,
-
-          ennemyDistanceTolerance: 10,
-          ennemyValue: 10,
-          ennemiesSpeed: 0.6,
-          ennemyLastSpawn: 0,
-          distanceForEnnemiesSpawn: 50,
-          status : "playing",
-         };
-
-        console.log(Math.floor(this.game.level));
     }
 }
 
 new Scene();
 
- /*this.computer = new Computer();
-            this.computer.loadJson().then(() => {
-                const computer = this.computer.obj;
-                this.collidableMeshes.push(this.computer.mesh);
-                this.objects.add(computer);
-            });
-            this.instances.push(this.computer);*/
+/*
+this.computer = new Computer();
+this.computer.loadJson().then(() => {
+    const computer = this.computer.obj;
+    this.collidableMeshes.push(this.computer.mesh);
+    this.objects.add(computer);
+});
+this.instances.push(this.computer);
+*/
