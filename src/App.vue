@@ -5,7 +5,7 @@
             <p>{{right}}</p>
         </div>
         <div class="bottom">
-            <p>level <span>{{level}}</span></p>
+            <p>level <span>{{Math.floor(distance / 1000)}}</span></p>
             <p>distance <span>{{distance}}</span></p>
         </div>
     </div>

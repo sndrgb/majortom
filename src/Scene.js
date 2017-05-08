@@ -4,6 +4,7 @@ const gsap = require('gsap');
 const CANNON = require('cannon');
 const OrbitControls = require('three-orbitcontrols');
 
+import round from 'lodash/round';
 import { deg2rad } from './utils';
 import colors from './colors';
 import globals from './globals';
@@ -189,7 +190,7 @@ class Scene {
         ) {
             this.game.speedLastUpdate = Math.floor(this.game.distance);
             this.game.targetBaseSpeed += this.game.incrementSpeedByTime * this.game.deltaTime;
-            console.log('speed-up', this.game.incrementSpeedByTime, this.game.deltaTime);
+            console.log('speed up');
         }
 
         // update level
@@ -199,10 +200,11 @@ class Scene {
         ) {
             this.game.levelLastUpdate = Math.floor(this.game.distance);
             this.game.level++;
-            this.game.targetBaseSpeed = this.game.initSpeed + this.game.incrementSpeedByLevel * this.game.level;
-            
-            console.log('level-up');
+            this.game.targetBaseSpeed += (this.game.incrementSpeedByLevel * this.game.level * this.game.deltaTime);
+            console.log('level up');
         }
+
+        //console.log(Math.floor(this.game.distance));
 
         this.updateDistance();
         this.game.baseSpeed += (this.game.targetBaseSpeed - this.game.baseSpeed) * this.game.deltaTime * 0.02;

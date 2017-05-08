@@ -48,7 +48,6 @@ export default class Sphere {
 
             if (next === false && this.previous === true) {
                 this.velocity = _.random(2000 * game.speed, 4000 * game.speed);
-                console.log(`new velocity: ${this.velocity}`);
                 this.mesh.position.z = - 900;
             }
 
