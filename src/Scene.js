@@ -30,7 +30,6 @@ class Scene {
         this.reset();
 
         this.render = this.render.bind(this);
-        this.loop = loop(this.render);
 
         const width = window.innerWidth;
         const height = window.innerHeight;
@@ -77,7 +76,7 @@ class Scene {
         this.scene.add(this.ground.getGround());
 
         setTimeout(() => {
-            this.addSpheres();
+            this.addSpheres(this.game.enemyValue);
         }, 5000);
 
         this.addLights();
@@ -89,8 +88,6 @@ class Scene {
         this.world = new World();
 
         this.scene.add(this.objects);
-        // start rendering
-        this.loop.start();
     }
 
     calculateFrustum() {
@@ -107,12 +104,12 @@ class Scene {
 
     reset() {
         setTimeout(() => {
-            this.addSpheres();
+            this.addSpheres(this.game.enemyValue);
         }, 5000);
     }
 
-    addSpheres() {
-        for (let i = 0; i <= this.game.enemyValue; i++) {
+    addSpheres(n) {
+        for (let i = 0; i <= n; i++) {
             const sphere = new Sphere(this.frustum, this.game, i);
             this.instances.push(sphere);
             this.collidableMeshes.push(sphere.mesh);
@@ -185,16 +182,14 @@ class Scene {
         this.instances.forEach(el => el.update(this.frustum, this.game));
         this.updateCollisions();
 
-        console.log(Math.floor(this.game.distance), this.game.speed, this.game.level);
         // update speed
         if (
             Math.floor(this.game.distance) % this.game.distanceForSpeedUpdate == 0 &&
             Math.floor(this.game.distance) > this.game.speedLastUpdate
         ) {
-            console.log('speed-up');
             this.game.speedLastUpdate = Math.floor(this.game.distance);
             this.game.targetBaseSpeed += this.game.incrementSpeedByTime * this.game.deltaTime;
-            console.log(this.game.incrementSpeedByTime, this.game.deltaTime);
+            console.log('speed-up', this.game.incrementSpeedByTime, this.game.deltaTime);
         }
 
         // update level
@@ -202,11 +197,11 @@ class Scene {
             Math.floor(this.game.distance) % this.game.distanceForLevelUpdate == 0 && 
             Math.floor(this.game.distance) > this.game.levelLastUpdate
         ) {
-            console.log('level-up');
             this.game.levelLastUpdate = Math.floor(this.game.distance);
             this.game.level++;
-            this.fieldLevel.innerHTML = Math.floor(this.game.level);
             this.game.targetBaseSpeed = this.game.initSpeed + this.game.incrementSpeedByLevel * this.game.level;
+            
+            console.log('level-up');
         }
 
         this.updateDistance();
@@ -271,7 +266,7 @@ class Scene {
     }
 }
 
-new Scene();
+export default Scene;
 
 /*
 this.computer = new Computer();

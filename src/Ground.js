@@ -4,12 +4,14 @@ const THREE = require('three');
 import colors from './colors';
 import globals from './globals';
 
+const image = require('./assets/ground.png');
+
 export default class Ground {
     constructor(s, d) {
         const solidGroundGeo = new THREE.PlaneGeometry(s, s, d, d);
         solidGroundGeo.rotateX(-Math.PI / 2);
 
-        this.texture = new THREE.TextureLoader().load('/assets/ground.png');
+        this.texture = new THREE.TextureLoader().load(image);
         this.texture.wrapS = this.texture.wrapT = THREE.RepeatWrapping;
         const textureSize = globals.step;
         this.texture.repeat.set(textureSize, textureSize);

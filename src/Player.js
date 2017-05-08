@@ -3,6 +3,9 @@ const gsap = require('gsap');
 import colors from './colors';
 import globals from './globals';
 
+const spaceship = require('./assets/spaceship.json');
+console.log(spaceship);
+
 export default class Player {
     constructor(frustum) {
         this.frustum = frustum;
@@ -17,7 +20,7 @@ export default class Player {
         // Create player on json load
         var ObjectLoader = new THREE.ObjectLoader();
 
-        ObjectLoader.load('./spaceship.json', (obj) => {
+        ObjectLoader.load(spaceship, (obj) => {
             var m = new THREE.Matrix4();
             m.makeRotationY(Math.PI / 1);
             m.makeRotationX(Math.PI / 2);
@@ -46,9 +49,6 @@ export default class Player {
         this.spaceship.position.x = globals.step / 2;
         this.spaceship.position.z = 900 * window.ASPECT_RATIO;
         this.spaceship.rotation.y = Math.PI / 1;
-
-
-        console.log('vertici' + this.mesh.geometry.vertices);
 
         TweenMax.to(this.spaceship.position, 1.2, {
             delay: 2,
@@ -120,7 +120,7 @@ export default class Player {
         // Move forward
         else if (
             this.controlKeys[event.keyCode] === 'forward' &&
-            this.currentVertical >= -1
+            this.currentVertical >= -3
         ) {
             this.currentVertical = this.currentVertical - 1;
             TweenMax.to(this.spaceship.rotation, 0.3, { x: -0.2 });
