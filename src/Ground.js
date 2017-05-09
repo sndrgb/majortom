@@ -18,13 +18,11 @@ export default class Ground {
 
         const floorMat = new THREE.MeshLambertMaterial({
             map: this.texture,
-            // wireframe: true,
             emissive: colors.floor.emissive,
             side: THREE.DoubleSide,
         });
 
         this.ground = new THREE.Mesh(solidGroundGeo, floorMat);
-        this.ground.castShadow = true;
         this.ground.receiveShadow = true;
     }
 

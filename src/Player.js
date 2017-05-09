@@ -4,7 +4,6 @@ import colors from './colors';
 import globals from './globals';
 
 const spaceship = require('./assets/spaceship.json');
-console.log(spaceship);
 
 export default class Player {
     constructor(frustum) {

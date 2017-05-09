@@ -178,46 +178,37 @@ class Scene {
         this.newTime = new Date().getTime();
         this.game.deltaTime = this.newTime - this.oldTime;
         this.oldTime = this.newTime;
-        
+
         this.ground.update(this.game);
         this.instances.forEach(el => el.update(this.frustum, this.game));
         this.updateCollisions();
 
+        const floorDistance = Math.floor(this.game.distance);
+
         // update speed
         if (
-            Math.floor(this.game.distance) % this.game.distanceForSpeedUpdate == 0 &&
-            Math.floor(this.game.distance) > this.game.speedLastUpdate
+            floorDistance % this.game.distanceForSpeedUpdate == 0 &&
+            floorDistance > this.game.speedLastUpdate
         ) {
-            this.game.speedLastUpdate = Math.floor(this.game.distance);
+            this.game.speedLastUpdate = floorDistance;
             this.game.targetBaseSpeed += this.game.incrementSpeedByTime * this.game.deltaTime;
-            console.log('speed up');
         }
 
         // update level
         if (
-            Math.floor(this.game.distance) % this.game.distanceForLevelUpdate == 0 && 
-            Math.floor(this.game.distance) > this.game.levelLastUpdate
+            floorDistance % this.game.distanceForLevelUpdate == 0 && 
+            floorDistance > this.game.levelLastUpdate
         ) {
-            this.game.levelLastUpdate = Math.floor(this.game.distance);
+            this.game.levelLastUpdate = floorDistance;
             this.game.level++;
             this.game.targetBaseSpeed += (this.game.incrementSpeedByLevel * this.game.level * this.game.deltaTime);
-            console.log('level up');
         }
 
-        //console.log(Math.floor(this.game.distance));
-
-        this.updateDistance();
+        this.game.distance += this.game.speed * this.game.deltaTime * this.game.ratioSpeedDistance;
         this.game.baseSpeed += (this.game.targetBaseSpeed - this.game.baseSpeed) * this.game.deltaTime * 0.02;
         this.game.speed = this.game.baseSpeed;
 
         this.renderer.render(this.scene, this.camera);
-    }
-
-    updateDistance(){
-        this.game.distance += this.game.speed * this.game.deltaTime * this.game.ratioSpeedDistance;
-        //console.log(Math.floor(this.game.distance));
-        // var d = 502*(1-(this.game.distance%this.game.distanceForLevelUpdate)/this.game.distanceForLevelUpdate);
-        //levelCircle.setAttribute("stroke-dashoffset", d);
     }
 
     reset() {
@@ -262,6 +253,8 @@ class Scene {
                 const collisionResults = ray.intersectObjects(this.collidableMeshes);
                 if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length()) {
                     this.player.dead();
+                    this.reset();
+                    
                 }
             }
         }
