@@ -21,10 +21,10 @@
                 </button>
             </div>
         </transition>
-        <!--<div class="top">
+        <div class="top">
             <p>{{msg}}</p>
             <p>{{right}}</p>
-        </div>-->
+        </div>
         <transition name="fade">
             <div v-if="show">
                 <div class="mid" v-if="status === 'gameover' || status === 'paused'">
