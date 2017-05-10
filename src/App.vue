@@ -214,7 +214,17 @@ canvas {
     p {
         font-size: 2.2rem;
         text-transform: uppercase;
+        margin-bottom: 1rem;
+    }
+
+    span {
+        font-size: 2.2rem;
+    }
+
+    h2 {
+        font-weight: 300;
         margin-bottom: 2rem;
+        text-align:center;
     }
 }
 
