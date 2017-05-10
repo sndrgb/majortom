@@ -272,6 +272,25 @@ button {
   opacity: 0
 }
 
+.keys {
+    display:flex;
+    flex-flow: column;
+    align-items: center;
+    margin-top: 65px;
+
+    svg {
+        margin-top: 10px;
+        margin-left: 20px;
+        width: 50px;
+        stroke: $main-color;
+        fill: $main-color;
+    }
+    .st0 {
+        fill: none;
+        // fill: $main-color;
+    }
+}
+
 /*252525*/
 /*#46ffdd*/
 /*#8367d8*/
