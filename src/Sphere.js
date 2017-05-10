@@ -56,6 +56,22 @@ export default class Sphere {
             }
         }
     }
+
+    implode() {
+        let success;
+        const promise = new Promise((resolve) => {
+            success = resolve;
+        });
+
+        TweenMax.to(this.mesh.scale, 0.3, { 
+            x: 0.01, 
+            y: 0.01, 
+            z: 0.01,
+            onComplete: success,
+        });
+
+        return promise;
+    }
 }
 
 const Particle = (material) => {

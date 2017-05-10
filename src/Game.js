@@ -1,22 +1,21 @@
 const THREE = require('three');
 const loop = require('raf-loop');
 const gsap = require('gsap');
-const CANNON = require('cannon');
 const OrbitControls = require('three-orbitcontrols');
 
 import round from 'lodash/round';
+import delay from 'lodash/delay';
 import { deg2rad } from './utils';
 import colors from './colors';
 import globals from './globals';
 import Computer from './Computer';
-import Card from './Card';
-import World from './World';
 import Ground from './Ground';
 import Player from './Player';
 import Sphere from './Sphere';
 
-class Scene {
+class Game {
     constructor() {
+        this.firstStart = true;
         this.instances = [];
         this.collidableMeshes = [];
         this.scene = new THREE.Scene();
@@ -27,8 +26,6 @@ class Scene {
 
         this.newTime = new Date().getTime();
         this.oldTime = new Date().getTime();
-
-        this.reset();
 
         this.render = this.render.bind(this);
 
@@ -70,25 +67,16 @@ class Scene {
     }
 
     init() {
-        this.objects = new THREE.Object3D();
         this.calculateFrustum();
 
         this.ground = new Ground(globals.size, globals.divisions);
         this.scene.add(this.ground.getGround());
 
-        setTimeout(() => {
-            this.addSpheres(this.game.enemyValue);
-        }, 5000);
-
         this.addLights();
-        // this.addHelpers();
+        //this.addHelpers();
 
         this.player = new Player();
         this.scene.add(this.player.spaceship);
-
-        this.world = new World();
-
-        this.scene.add(this.objects);
     }
 
     calculateFrustum() {
@@ -104,9 +92,26 @@ class Scene {
     }
 
     reset() {
-        setTimeout(() => {
+        this.ambient.intensity = 1;
+
+        if (this.firstStart) {
+            this.resetProps('playing');
+            this.player.restart();
+            this.firstStart = false;
+        } else {
+            this.instances.forEach((el) => {
+                el.implode().then(() => {
+                    this.scene.remove(el.getSphere());
+                    this.resetProps('playing');
+                    this.player.restart();
+
+                });
+            });
+        }
+
+        delay(() => {
             this.addSpheres(this.game.enemyValue);
-        }, 5000);
+        }, 2000);
     }
 
     addSpheres(n) {
@@ -114,7 +119,7 @@ class Scene {
             const sphere = new Sphere(this.frustum, this.game, i);
             this.instances.push(sphere);
             this.collidableMeshes.push(sphere.mesh);
-            this.objects.add(sphere.getSphere());
+            this.scene.add(sphere.getSphere());
         }
     }
 
@@ -145,8 +150,8 @@ class Scene {
     }
 
     addLights() {
-        const ambient = new THREE.AmbientLight(colors.ambient);
-        this.scene.add(ambient);
+        this.ambient = new THREE.AmbientLight(colors.ambient);
+        this.scene.add(this.ambient);
 
         const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.2);
         hemiLight.color.setHex(0xffffff);
@@ -179,40 +184,57 @@ class Scene {
         this.game.deltaTime = this.newTime - this.oldTime;
         this.oldTime = this.newTime;
 
-        this.ground.update(this.game);
         this.instances.forEach(el => el.update(this.frustum, this.game));
         this.updateCollisions();
 
         const floorDistance = Math.floor(this.game.distance);
+        this.ground.update(this.game);
 
-        // update speed
-        if (
-            floorDistance % this.game.distanceForSpeedUpdate == 0 &&
-            floorDistance > this.game.speedLastUpdate
-        ) {
-            this.game.speedLastUpdate = floorDistance;
-            this.game.targetBaseSpeed += this.game.incrementSpeedByTime * this.game.deltaTime;
+        if (this.game.status === 'playing') {
+            // update speed
+            if (
+                floorDistance % this.game.distanceForSpeedUpdate == 0 &&
+                floorDistance > this.game.speedLastUpdate
+            ) {
+                this.game.speedLastUpdate = floorDistance;
+                this.game.targetBaseSpeed += this.game.incrementSpeedByTime * this.game.deltaTime;
+            }
+
+            // update level
+            if (
+                floorDistance % this.game.distanceForLevelUpdate == 0 && 
+                floorDistance > this.game.levelLastUpdate
+            ) {
+                this.game.levelLastUpdate = floorDistance;
+                this.game.level++;
+                this.game.targetBaseSpeed += (this.game.incrementSpeedByLevel * this.game.level * this.game.deltaTime);
+            }
+
+            this.game.distance += this.game.speed * this.game.deltaTime * this.game.ratioSpeedDistance;
+            this.game.baseSpeed += (this.game.targetBaseSpeed - this.game.baseSpeed) * this.game.deltaTime * 0.02;
+            this.game.speed = this.game.baseSpeed;
+
+        } else if(this.game.status === 'gameover') {
+
+            this.player.dead();
+            this.game.speed *= .99;
+            this.ambient.intensity *= 1.01;
+
+            if (this.ambient.intensity >= 3) {
+                this.game.status = 'paused';
+                this.game.stop = true;
+            };
         }
-
-        // update level
-        if (
-            floorDistance % this.game.distanceForLevelUpdate == 0 && 
-            floorDistance > this.game.levelLastUpdate
-        ) {
-            this.game.levelLastUpdate = floorDistance;
-            this.game.level++;
-            this.game.targetBaseSpeed += (this.game.incrementSpeedByLevel * this.game.level * this.game.deltaTime);
-        }
-
-        this.game.distance += this.game.speed * this.game.deltaTime * this.game.ratioSpeedDistance;
-        this.game.baseSpeed += (this.game.targetBaseSpeed - this.game.baseSpeed) * this.game.deltaTime * 0.02;
-        this.game.speed = this.game.baseSpeed;
 
         this.renderer.render(this.scene, this.camera);
     }
 
-    reset() {
+    resetProps(status = 'paused') {
+        this.collidableMeshes = [];
+        this.instances = [];
+
         this.game = {
+          status,
           speed: 0,
           
           initSpeed: 0.0005,
@@ -233,35 +255,25 @@ class Scene {
           levelLastUpdate: 0,
 
           enemyValue: 4,
+          enemyDistanceTolerance: 60,
           enemyLastSpawn: 0,
-          status : "playing",
+          stop: false,
          };
-
-        // console.log(Math.floor(this.game.level));
     }
 
     updateCollisions() {
-        if (this.collidableMeshes[0] !== undefined && this.player.mesh) {
-            const originPoint = this.player.spaceship.position.clone();
+        this.collidableMeshes.forEach((enemy) => {
+            const diffPos = this.player.spaceship.position.clone().sub(enemy.position.clone());
+            const d = diffPos.length();
 
-            for (var vertexIndex = 0; vertexIndex < this.player.mesh.geometry.vertices.length; vertexIndex++) {
-                const localVertex = this.player.mesh.geometry.vertices[vertexIndex].clone();
-                const globalVertex = localVertex.applyMatrix4(this.player.mesh.matrix);
-                const directionVector = globalVertex.sub(this.player.mesh.position);
-
-                const ray = new THREE.Raycaster(originPoint, directionVector.clone().normalize());
-                const collisionResults = ray.intersectObjects(this.collidableMeshes);
-                if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length()) {
-                    this.player.dead();
-                    this.reset();
-                    
-                }
+            if (d < this.game.enemyDistanceTolerance) {
+                this.game.status = 'gameover';
             }
-        }
+        });
     }
 }
 
-export default Scene;
+export default Game;
 
 /*
 this.computer = new Computer();

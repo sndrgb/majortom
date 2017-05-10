@@ -27,7 +27,8 @@ export default class Ground {
     }
 
     update(game) {
-        this.texture.offset.y += (game.speed * 20);
+        const factor = game.status === 'paused' ? 0.01 : (game.speed * 20);
+        this.texture.offset.y += factor;
     }
 
     getGround() {

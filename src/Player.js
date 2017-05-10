@@ -7,6 +7,7 @@ const spaceship = require('./assets/spaceship.json');
 
 export default class Player {
     constructor(frustum) {
+        this.deadTweens = [];
         this.frustum = frustum;
         this.spaceship = new THREE.Object3D();
         this.currentHorizontal = 0;
@@ -43,10 +44,23 @@ export default class Player {
         this.mesh.castShadow = true;
         this.mesh.name = "playerMesh";
 
-        this.spaceship.add(this.mesh);
-
         this.spaceship.position.x = globals.step / 2;
         this.spaceship.position.z = 900 * window.ASPECT_RATIO;
+        this.spaceship.position.y = 0;
+
+        this.spaceship.add(this.mesh);
+    }
+
+    restart() {
+        this.currentHorizontal = 0;
+        this.currentVertical = 0;
+        this.deadTweens.forEach((el) => el.kill());
+        this.spaceship.position.x = globals.step / 2;
+        this.spaceship.position.z = 900 * window.ASPECT_RATIO;
+        this.spaceship.position.y = 0;
+
+        this.spaceship.rotation.z = 0;
+        this.spaceship.rotation.x = 0;
         this.spaceship.rotation.y = Math.PI / 1;
 
         TweenMax.to(this.spaceship.position, 1.2, {
@@ -67,9 +81,8 @@ export default class Player {
             68: "right"
         };
 
-        const onKeyDown = this.onKeyDown;
-        document.addEventListener('keydown', onKeyDown.bind(this), false);
-        // document.addEventListener("keyup", onKeyUp, false);
+        this.onKeyDown = this.onKeyDown.bind(this);
+        document.addEventListener('keydown', this.onKeyDown, false);
     }
 
     onKeyDown(event) {
@@ -154,13 +167,10 @@ export default class Player {
     }
 
     dead() {
-        TweenMax.to(this.spaceship.position, 10, {
-            y:  5000,
-            ease: Power2.easeOut,
-        });
+        document.removeEventListener('keydown', this.onKeyDown);
 
-        TweenMax.to(this.spaceship.rotation, 0.5, {
-            y: 5
-        });
+        const tween1 = TweenMax.to(this.spaceship.position, 3, { y:  900, ease: Power1.easeOut });
+        const tween2 = TweenMax.to(this.spaceship.rotation, 2, { y: 5 });
+        this.deadTweens = [tween1, tween2];
     }
 }
