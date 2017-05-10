@@ -128,20 +128,6 @@ class Game {
         controls.enableDamping = true;
         controls.dampingFactor = 0.25;
 
-        const solidGroundGeo = new THREE.PlaneGeometry(
-            globals.STEP * 2,
-            (this.camera.top * 2) + (this.camera.position.z * 2),
-        20, 20);
-        solidGroundGeo.rotateX(-Math.PI / 2);
-        const floorMat = new THREE.MeshLambertMaterial({
-            wireframe: true,
-            color: 0xff0000,
-            side: THREE.DoubleSide,
-        });
-
-        const ground = new THREE.Mesh(solidGroundGeo, floorMat);
-        // this.scene.add(ground);
-
         var helper = new THREE.CameraHelper( this.camera );
         this.scene.add( helper );
 
@@ -237,9 +223,9 @@ class Game {
           status,
           speed: 0,
           
-          initSpeed: 0.0005,
-          baseSpeed: 0.0005,
-          targetBaseSpeed: 0.0005,
+          initSpeed: 0.0008,
+          baseSpeed: 0.0008,
+          targetBaseSpeed: 0.0008,
           
           incrementSpeedByTime: 0.000005,
           incrementSpeedByLevel: 0.00001,
