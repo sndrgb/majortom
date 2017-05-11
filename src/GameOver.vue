@@ -9,7 +9,7 @@
             You run for<br>
             <span class="distance">{{Math.floor(distance % 1000)}}</span>
             at level
-            <span class="distance">{{Math.floor(distance / 1000)}}</span>
+            <span class="distance">{{Math.floor(distance / 1000) + 1}}</span>
         </h2>
         <div class="choice">
             <button @click="replay">
