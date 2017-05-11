@@ -3,7 +3,7 @@
         <transition appear @enter="enterIntro" @leave="leaveIntro" :css="false">
             <Intro v-if="!isIntro" :play="play"></Intro>
         </transition>
-        <div class="top">
+        <div class="top" v-if="isIndie">
             <p>{{msg}}</p>
             <p>{{right}}</p>
         </div>
@@ -43,6 +43,7 @@ export default {
             distance: 0,
             level: 0,
             game: null,
+            isIndie: false,
             isIntro: false,
             status: 'paused',
         }
@@ -159,28 +160,6 @@ canvas {
     top: 0;
     justify-content: space-between;
     visibility: visible;
-}
-
-.bottom {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    width: 100%;
-    justify-content: flex-end;
-    flex-flow: column;
-    visibility: visible;
-
-    p {
-        text-align: right;
-        margin-top: 2rem;
-    }
-
-    span {
-        font-size: 3rem;
-        display: block;
-    }
 }
 
 

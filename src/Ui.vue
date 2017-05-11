@@ -11,5 +11,28 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
+.bottom {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    display: flex;
+    width: 100%;
+    align-items: flex-end;
+    justify-content: center;
+    flex-flow: column;
+    visibility: visible;
+
+    p {
+        text-align: right;
+        margin-top: 2rem;
+    }
+
+    span {
+        font-size: 3rem;
+        display: block;
+    }
+}
 </style>
