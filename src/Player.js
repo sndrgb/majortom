@@ -51,7 +51,7 @@ export default class Player {
         this.spaceship.add(this.mesh);
     }
 
-    restart() {
+    reset() {
         this.currentHorizontal = 0;
         this.currentVertical = 0;
         this.deadTweens.forEach((el) => el.kill());
@@ -62,6 +62,10 @@ export default class Player {
         this.spaceship.rotation.z = 0;
         this.spaceship.rotation.x = 0;
         this.spaceship.rotation.y = Math.PI / 1;
+    }
+
+    restart() {
+        this.reset();
 
         TweenMax.to(this.spaceship.position, 1.2, {
             delay: 2,

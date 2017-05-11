@@ -120,6 +120,7 @@ class Game {
         this.instances.forEach((el) => {
             el.implode().then(() => {
                 this.scene.remove(el.getSphere());
+                this.player.reset();
                 this.resetProps('paused');
             });
         });
