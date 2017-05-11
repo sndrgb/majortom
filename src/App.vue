@@ -1,30 +1,24 @@
 <template>
-    <div id="app">
+    <div id="app" v-if="game !== null">
         <transition appear @enter="enterIntro" @leave="leaveIntro" :css="false">
-            <Intro v-if="!show" :show="show" :play="play"></Intro>
+            <Intro v-if="!isIntro" :play="play"></Intro>
         </transition>
         <div class="top">
             <p>{{msg}}</p>
             <p>{{right}}</p>
         </div>
+        <GameOver
+            v-if="(status === 'gameover' || status === 'paused') && isIntro" 
+            :distance="game.game.distance" 
+            :replay="replay"
+            :backHome="backHome"
+        ></GameOver>
         <transition name="fade">
-            <div v-if="show">
-                <div class="mid" v-if="status === 'gameover' || status === 'paused'">
-                    <p>Game Over</p>
-                    <h2>
-                        You run for<br>
-                        <span>{{Math.floor(game.game.distance)}}</span>
-                    </h2>
-                    <button @click="replay">
-                        Replay
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path d="M12 0c3.31 0 6.29 1.353 8.46 3.522l2.48-2.48L24 8.382l-7.437-.965 2.49-2.49C17.242 3.122 14.752 2 12 2 6.486 2 2 6.486 2 12s4.486 10 10 10c3.872 0 7.23-2.216 8.89-5.443l1.717 1.046C20.595 21.406 16.602 24 12 24 5.373 24 0 18.627 0 12S5.373 0 12 0z"/></svg>
-                    </button>
-                </div>
-                <div class="bottom" v-if="status === 'playing'">
-                    <p>level <span>{{Math.floor(distance / 1000)}}</span></p>
-                    <p>distance <span>{{distance}}</span></p>
-                </div>
-            </div>
+            <Ui 
+                v-if="isIntro && status === 'playing'" 
+                :distance="Math.floor(distance % 1000)"
+                :level="Math.floor(distance / 1000)"
+            ></Ui>
         </transition>
     </div>
 </template>
@@ -33,7 +27,10 @@
 import { TimelineMax } from 'gsap';
 import loop from 'raf-loop';
 import Game from './Game';
+
 import Intro from './Intro.vue';
+import GameOver from './GameOver.vue';
+import Ui from './Ui.vue';
 
 export default {
     name: 'app',
@@ -43,13 +40,14 @@ export default {
             right: 'by Alessandro Rigobello @sndrgb',
             distance: 0,
             level: 0,
-            show: false,
+            game: null,
+            isIntro: false,
             status: 'paused',
         }
     },
 
     components: {
-        Intro
+        Intro, GameOver, Ui
     },
 
     mounted() {
@@ -62,8 +60,6 @@ export default {
 
     methods: {
         render() {
-            //if (this.game.game.stop) this.loop.stop();
-            //console.log(this.game.game.stop);
             this.game.render();
             this.distance = Math.floor(this.game.game.distance);
             this.level = this.game.game.level;
@@ -74,9 +70,14 @@ export default {
             this.game.reset();
         },
 
+        backHome() {
+            this.isIntro = false;
+            this.game.destroy();
+        },
+
         play() {
-            this.show = true;
-            this.game.reset('playing');
+            this.isIntro = true;
+            this.game.reset();
         },
 
         enterIntro(el, done) {
@@ -156,35 +157,6 @@ canvas {
     top: 0;
     justify-content: space-between;
     visibility: visible;
-}
-
-.mid {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    top: 0;
-    display: flex;
-    flex-flow: column;
-    align-items: center;
-    justify-content: center;
-    visibility: visible;
-
-    p {
-        font-size: 2.2rem;
-        text-transform: uppercase;
-        margin-bottom: 1rem;
-    }
-
-    span {
-        font-size: 2.2rem;
-    }
-
-    h2 {
-        font-weight: 300;
-        margin-bottom: 2rem;
-        text-align:center;
-    }
 }
 
 .bottom {

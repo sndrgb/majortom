@@ -13,9 +13,7 @@
         </svg>
     </h2>
     <button id="play-button" @click="play">
-        Play
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
-        <path d="M3 22V2l18 10L3 22z"/></svg>
+        Play <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path d="M3 22V2l18 10L3 22z"/></svg>
     </button>
     <div class="keys">
         <span>
@@ -36,7 +34,7 @@
 
 <script>
 export default {
-    props: ['show', 'play']
+    props: ['play']
 }
 </script>
 

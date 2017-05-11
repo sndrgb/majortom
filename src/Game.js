@@ -91,7 +91,7 @@ class Game {
         this.frustum.setFromMatrix(cameraViewProjectionMatrix);
     }
 
-    reset() {
+    reset(status = 'playing') {
         this.ambient.intensity = 1;
 
         if (this.firstStart) {
@@ -102,9 +102,8 @@ class Game {
             this.instances.forEach((el) => {
                 el.implode().then(() => {
                     this.scene.remove(el.getSphere());
-                    this.resetProps('playing');
+                    this.resetProps(status);
                     this.player.restart();
-
                 });
             });
         }
@@ -112,6 +111,18 @@ class Game {
         delay(() => {
             this.addSpheres(this.game.enemyValue);
         }, 2000);
+    }
+
+    destroy() {
+        this.ambient.intensity = 1;
+        this.firstStart = true;
+
+        this.instances.forEach((el) => {
+            el.implode().then(() => {
+                this.scene.remove(el.getSphere());
+                this.resetProps('paused');
+            });
+        });
     }
 
     addSpheres(n) {
@@ -223,14 +234,14 @@ class Game {
           status,
           speed: 0,
           
-          initSpeed: 0.0008,
-          baseSpeed: 0.0008,
-          targetBaseSpeed: 0.0008,
+          initSpeed: 0.008,
+          baseSpeed: 0.008,
+          targetBaseSpeed: 0.002,
           
           incrementSpeedByTime: 0.000005,
           incrementSpeedByLevel: 0.00001,
 
-          distanceForLevelUpdate: 1000,
+          distanceForLevelUpdate: 500,
           distanceForSpeedUpdate: 100,
           distance: 0,
           speedLastUpdate: 0,
