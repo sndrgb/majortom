@@ -1,7 +1,7 @@
 <template>
     <div id="app">
-        <transition appear @:enter="enterIntro" @:leave="leaveIntro" :css="false">
-            <Intro :show="show" :play="play"></Intro>
+        <transition appear @enter="enterIntro" @leave="leaveIntro" :css="false">
+            <Intro v-if="!show" :show="show" :play="play"></Intro>
         </transition>
         <div class="top">
             <p>{{msg}}</p>
@@ -30,9 +30,10 @@
 </template>
 
 <script>
+import { TimelineMax } from 'gsap';
 import loop from 'raf-loop';
-import Game from './Game'
-import Intro from './Intro.vue'
+import Game from './Game';
+import Intro from './Intro.vue';
 
 export default {
     name: 'app',
@@ -79,13 +80,32 @@ export default {
         },
 
         enterIntro(el, done) {
-            console.log(el);
-            done();
+            const tl = new TimelineMax({ onComplete: done });
+
+            tl.fromTo(el, 0.5, {
+                autoAlpha: 0
+            }, {
+                autoAlpha: 1
+            });
         },
 
         leaveIntro(el, done) {
-            console.log(el);
-            done();
+            const tl = new TimelineMax({ onComplete: done });
+
+            tl
+            .add('start')
+            .to('.keys', 0.5, {
+                autoAlpha: 0,
+            }, 'start')
+            .to('#play-button', 0.3, {
+                autoAlpha: 0,
+            }, 'start')
+            .to('#logo', 0.3, {
+                scaleX: 1.5,
+                scaleY: 1.5,
+                ease: Power3.easeOut,
+                autoAlpha: 0,
+            }, 'start+=0.3');
         }
     }
 }
@@ -112,50 +132,6 @@ $main-color: #2c3e50;
   color: $main-color;
   margin: 40px;
   z-index: 20;
-}
-
-.intro {
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    z-index: 10;
-    display: flex;
-    flex-flow: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-
-    > h2 svg {
-        width: 350px;
-        margin-bottom: 25px;
-    }
-
-    /*#252525*/
-    /*#46ffdd*/
-    /*#8367d8*/
-
-    .major {
-        fill: #252525;
-    }
-
-    .tom {
-        fill: #8367d8;
-    }
-
-    > p {
-        margin: 5px;
-        line-height: 25px;
-    }
-
-    > button {
-        &:hover {
-            svg {
-                transform: translateX(2px);
-            }
-        }
-    }
 }
 
 p {
