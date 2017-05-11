@@ -7,12 +7,14 @@
             <p>{{msg}}</p>
             <p>{{right}}</p>
         </div>
-        <GameOver
-            v-if="(status === 'gameover' || status === 'paused') && isIntro" 
-            :distance="game.game.distance" 
-            :replay="replay"
-            :backHome="backHome"
-        ></GameOver>
+        <transition name="fade">
+            <GameOver
+                v-if="(status === 'gameover' || status === 'paused') && isIntro" 
+                :distance="game.game.distance" 
+                :replay="replay"
+                :backHome="backHome"
+            ></GameOver>
+        </transition>
         <transition name="fade">
             <Ui 
                 v-if="isIntro && status === 'playing'" 
