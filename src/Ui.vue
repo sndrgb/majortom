@@ -1,6 +1,6 @@
 <template>
     <div class="bottom">
-        <p>level <span>{{level}}</span></p>
+        <p>level <span>{{level + 1}}</span></p>
         <p>distance <span>{{distance}}</span></p>
     </div>
 </template>

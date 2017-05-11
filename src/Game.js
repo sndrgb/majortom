@@ -34,11 +34,6 @@ class Game {
         const aspect = width / height;
         window.ASPECT_RATIO = aspect;
 
-        // http://stackoverflow.com/questions/31978368/three-js-fit-orthographic-camera-to-scene
-        // http://stackoverflow.com/questions/14614252/how-to-fit-camera-to-object
-        // var maxDim = Math.max(width, height);
-        // var distance = maxDim/ 2 /  ratio / Math.tan(Math.PI * fov / 360);
-
         this.camera = new THREE.OrthographicCamera(width / - 2, width / 2, height / 2, height / - 2, -1000, 5000);
         this.camera.position.x = 200;
         this.camera.position.y = 200;
@@ -242,7 +237,7 @@ class Game {
           incrementSpeedByTime: 0.000005,
           incrementSpeedByLevel: 0.00001,
 
-          distanceForLevelUpdate: 500,
+          distanceForLevelUpdate: 1000,
           distanceForSpeedUpdate: 100,
           distance: 0,
           speedLastUpdate: 0,

@@ -173,7 +173,7 @@ export default class Player {
     dead() {
         document.removeEventListener('keydown', this.onKeyDown);
 
-        const tween1 = TweenMax.to(this.spaceship.position, 3, { y:  900, ease: Power1.easeOut });
+        const tween1 = TweenMax.to(this.spaceship.position, 3, { y:  1500, ease: Power1.easeOut });
         const tween2 = TweenMax.to(this.spaceship.rotation, 2, { y: 5 });
         this.deadTweens = [tween1, tween2];
     }
